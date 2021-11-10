@@ -11,45 +11,40 @@ def fuel_needs(modules_list: list) -> list:
     return [fuel_required(m) for m in modules_list]
 
 
-def main_01() -> int:
-    """Processes the input of part 1"""
-    with open("input.txt") as f:
-        modules = [int(m) for m in f.readlines()]
-        needs = fuel_needs(modules)
-        return sum(needs)
-
-
 ### PART 2
 def rec_ful_required(mass: int) -> int:
     """Recursively calls `fuel_required` as long as the result is positive. Returns the sum of fuel for one given mass"""
-    res_list = []
-    res = fuel_required(mass)
-    res_list.append(res)
-    while res > 0:
-        res = fuel_required(res)
-        if res > 0:
-            res_list.append(res)
+    total = 0
+    next_fuel = fuel_required(mass)
 
-    return sum(res_list)
+    while next_fuel > 0:
+        total += next_fuel
+        next_fuel = fuel_required(next_fuel)
+
+    return total
 
 
-def main_02() -> int:
-    """Processes the input of part 2"""
+def main() -> int:
+    """Processes the input"""
     with open("input.txt") as f:
         modules = [int(m) for m in f.readlines()]
-        needs = [rec_ful_required(m) for m in modules]
-        return sum(needs)
+
+        needs = fuel_needs(modules)
+        print(f"Part 1 results :  {sum(needs)}")
+
+        rec_needs = [rec_ful_required(m) for m in modules]
+        print(f"Part 2 results :  {sum(rec_needs)}")
+
+        return sum(rec_needs)
 
 
 if __name__ == "__main__":
-    # print(f"{fuel_required(12)=}")
-    # print(f"{fuel_required(14)=}")
-    # print(f"{fuel_required(1969)=}")
-    # print(f"{fuel_required(100756)=}")
-    # print(main_01())
+    assert fuel_required(12) == 2
+    assert fuel_required(14) == 2
+    assert fuel_required(1969) == 654
+    assert fuel_required(100756) == 33583
 
-    # print(f"{rec_ful_required(12)=}")
-    # print(f"{rec_ful_required(14)=}")
-    # print(f"{rec_ful_required(1969)=}")
-    # print(f"{rec_ful_required(100756)=}")
-    print(main_02())
+    assert rec_ful_required(12) == 2
+    assert rec_ful_required(1969) == 966
+    assert rec_ful_required(100756) == 50346
+    main()
