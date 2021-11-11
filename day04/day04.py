@@ -1,3 +1,7 @@
+import re
+from collections import Counter
+from typing import List
+
 INPUT = "134564-585159"
 
 """
@@ -29,11 +33,45 @@ def check_rules(pw: int) -> bool:
     return True
 
 
+# Credits for part 2 : https://github.com/joelgrus/advent2019/blob/master/day04/day04.py
+
+
+def is_increasing(ds: List[int]) -> bool:
+    return all(x <= y for x, y in zip(ds, ds[1:]))
+
+
+def has_group_of_two(ds: List[int]) -> bool:
+    counts = Counter(ds)
+    return any(v == 2 for v in counts.values())
+
+
+def digits(n: int, num_digits: int = 6) -> List[int]:
+    d = []
+    for _ in range(num_digits):
+        d.append(n % 10)
+        n = n // 10
+    return list(reversed(d))
+
+
+def is_valid2(n: int) -> bool:
+    d = digits(n)
+    return is_increasing(d) and has_group_of_two(d)
+
+
 def check_range(r: str = "134564-585159") -> int:
     upper, lower = int(r.partition("-")[0]), int(r.partition("-")[-1])
     return sum([check_rules(pw) for pw in range(upper, lower + 1)])
 
 
+def check_range_2(r: str = "134564-585159") -> int:
+    upper, lower = int(r.partition("-")[0]), int(r.partition("-")[-1])
+    return sum([is_valid2(pw) for pw in range(upper, lower + 1)])
+
+
 if __name__ == "__main__":
 
-    print(check_range())
+    print("Part 1", check_range())
+    assert is_valid2(112233) == True
+    assert is_valid2(123444) == False
+    assert is_valid2(111122) == True
+    print("Part 2", check_range_2())
