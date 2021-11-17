@@ -5,6 +5,7 @@ under the assumption that I'd probably have to use it again on a later day.
 """
 from typing import List, NamedTuple, Tuple
 from enum import Enum
+import copy
 
 
 class Opcode(Enum):
@@ -16,6 +17,7 @@ class Opcode(Enum):
     JUMP_IF_FALSE = 6
     LESS_THAN = 7
     EQUALS = 8
+    RELATIVE_BASE_OFFSET = 9
     END_PROGRAM = 99
 
 
@@ -38,11 +40,22 @@ def parse_opcode(opcode: int, num_modes: int = 3) -> Tuple[Opcode, Modes]:
 Program = List[int]
 
 
+def check_if_relative(
+    program: Program, modes: Modes, pos: int, relative_base: int
+) -> int:
+    prog_copy = copy.deepcopy(program)
+    for idx, m in enumerate(modes):
+        if m == 2:
+            relative_base += prog_copy[pos + idx + 1]
+    return prog_copy, relative_base
+
+
 def run(program: Program, input: List[int]) -> List[int]:
     program = program[:]
     output = []
 
     pos = 0
+    relative_base = 0
 
     def get_value(pos: int, mode: int) -> int:
         if mode == 0:
@@ -51,6 +64,10 @@ def run(program: Program, input: List[int]) -> List[int]:
         elif mode == 1:
             # immediate mode
             return program[pos]
+        elif mode == 2:
+            # relative mode
+            return program[program[relative_base]]
+
         else:
             raise ValueError(f"unknown mode: {mode}")
 
@@ -63,6 +80,7 @@ def run(program: Program, input: List[int]) -> List[int]:
             value1 = get_value(pos + 1, modes[0])
             value2 = get_value(pos + 2, modes[1])
             program[program[pos + 3]] = value1 + value2
+            check_if_relative()
             pos += 4
         elif opcode == Opcode.MULTIPLY:
             value1 = get_value(pos + 1, modes[0])
@@ -120,6 +138,8 @@ def run(program: Program, input: List[int]) -> List[int]:
             else:
                 program[program[pos + 3]] = 0
             pos += 4
+        elif opcode == Opcode.RELATIVE_BASE_OFFSET:
+            relative_base += pos + 1
 
         else:
             raise RuntimeError(f"invalid opcode: {opcode}")
