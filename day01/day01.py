@@ -48,3 +48,6 @@ if __name__ == "__main__":
     assert rec_ful_required(1969) == 966
     assert rec_ful_required(100756) == 50346
     main()
+
+if __name__ == "__main__":
+    main()

@@ -5,6 +5,8 @@ from typing import Dict
 from typing import List
 from collections import Counter
 
+from numpy.lib.histograms import histogram_bin_edges
+
 
 class Image(NamedTuple):
     n_layer: int
@@ -90,3 +92,5 @@ with open("day08.txt") as f:
     one_layer_img = read_image(img)
     print("PART 2")
     convert_to_string(one_layer_img)
+
+d = {"a": one, "b": two}
